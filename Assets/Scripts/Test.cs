@@ -8,6 +8,6 @@ public class Test : MonoBehaviour
 
     private void Start()
     {
-        XlsToJson.ConvertCsvFileToJsonObject(path);
+        
     }
 }
