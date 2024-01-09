@@ -270,12 +270,6 @@ public class ExcelToJsonConverter
         return table;
     }
 
-    /// <summary>
-    /// Gets the json data for the specified spreadsheet in the specified DataSet
-    /// </summary>
-    /// <returns>The spread sheet json.</returns>
-    /// <param name="excelDataSet">Excel data set.</param>
-    /// <param name="sheetName">Sheet name.</param>
     private string GetSpreadSheetJson(DataSet excelDataSet, string sheetName)
     {
         // Get the specified table
