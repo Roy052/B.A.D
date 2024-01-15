@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class DataManager: MonoBehaviour
+public class DataManager: Singleton
 {
-    const string path = "./Assets/Data/";
+    string[] sheets = new string[]{ "Hero", "Mob" };
+
+    const string pathHead = "./Assets/Data/";
+    const string pathTail = ".bad";
 
     [System.Serializable]
-    public class MyData
+    public class DataList<T>
     {
-        public string a;
-        public string b;
-        public string c;
-        public string d;
+        public List<T> data;
     }
 
-    [System.Serializable]
-    public class MyDataList
+    void Awake()
     {
-        public List<MyData> data;
+        DontDestroyOnLoad(this);
+        if (dataManager == null)
+            dataManager = this;
+        else
+            Destroy(gameObject);
     }
 
-    private void Awake()
+    private void Start()
     {
         SetDatas();
     }
@@ -36,16 +39,16 @@ public class DataManager: MonoBehaviour
         }
     }
 
-    MyDataList LoadFromJson()
+    DataList<UnitData> LoadFromJson()
     {
         try
         {
             //Debug.Log(path);
-            if (File.Exists(path + "Sheet1.json"))
+            if (File.Exists(pathHead + sheets[0] + pathTail))
             {
-                string jsonText = File.ReadAllText(path + "Sheet1.json");
+                string jsonText = File.ReadAllText(pathHead + sheets[0] + pathTail);
                 //Debug.Log(json);
-                MyDataList dataList = JsonUtility.FromJson<MyDataList>("{\"data\":" + jsonText + "}");
+                DataList<UnitData> dataList = JsonUtility.FromJson<DataList<UnitData>> ("{\"data\":" + jsonText + "}");
                 return dataList;
             }
         }

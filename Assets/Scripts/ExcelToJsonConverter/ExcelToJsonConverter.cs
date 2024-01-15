@@ -56,11 +56,6 @@ public class ExcelToJsonConverter
         }
     }
 
-    /// <summary>
-    /// Gets all the file names in the specified directory
-    /// </summary>
-    /// <returns>The excel file names in directory.</returns>
-    /// <param name="directory">Directory.</param>
     private List<string> GetExcelFileNamesInDirectory(string directory)
     {
         string[] directoryFiles = Directory.GetFiles(directory);
@@ -83,14 +78,6 @@ public class ExcelToJsonConverter
         return excelFiles;
     }
 
-    /// <summary>
-    /// Converts each sheet in the specified excel file to json and saves them in the output folder.
-    /// The name of the processed json file will match the name of the excel sheet. Ignores
-    /// sheets whose name begin with '~'. Also ignores columns whose names begin with '~'.
-    /// </summary>
-    /// <returns><c>true</c>, if excel file was successfully converted to json, <c>false</c> otherwise.</returns>
-    /// <param name="filePath">File path.</param>
-    /// <param name="outputPath">Output path.</param>
     public bool ConvertExcelFileToJson(string filePath, string outputPath)
     {
         Debug.Log("Excel To Json Converter: Processing: " + filePath);
@@ -117,7 +104,7 @@ public class ExcelToJsonConverter
             {
                 // The file name is the sheet name with spaces removed
                 string fileName = excelData.Tables[i].TableName.Replace(" ", string.Empty);
-                WriteTextToFile(spreadSheetJson, outputPath + "/" + fileName + ".json");
+                WriteTextToFile(spreadSheetJson, outputPath + "/" + fileName + ".bad");
                 Debug.Log("Excel To Json Converter: " + excelData.Tables[i].TableName + " successfully written to file.");
             }
         }
@@ -230,7 +217,8 @@ public class ExcelToJsonConverter
         {
             DataRow row = table.NewRow();
             rowIsEmpty = true;
-
+            if (excelReader.Name == "Reference") continue;
+            
             for (int i = 0; i < excelReader.FieldCount; i++)
             {
                 // If the column is null and this is the first row, skip
@@ -308,22 +296,11 @@ public class ExcelToJsonConverter
         return Newtonsoft.Json.JsonConvert.SerializeObject(dataTable);
     }
 
-    /// <summary>
-    /// Writes the specified text to the specified file, overwriting it.
-    /// Creates file if it does not exist.
-    /// </summary>
-    /// <param name="text">Text.</param>
-    /// <param name="filePath">File path.</param>
     private void WriteTextToFile(string text, string filePath)
     {
         System.IO.File.WriteAllText(filePath, text);
     }
 
-    /// <summary>
-    /// Removes files which have not been modified since they were last processed
-    /// from the process list
-    /// </summary>
-    /// <param name="excelFiles">Excel files.</param>
     private List<string> RemoveUnmodifiedFilesFromProcessList(List<string> excelFiles, string outputDirectory)
     {
         List<string> sheetNames;
@@ -361,12 +338,7 @@ public class ExcelToJsonConverter
         return excelFiles;
     }
 
-    /// <summary>
-    /// Gets the list of sheet names in the specified excel file
-    /// </summary>
-    /// <returns>The sheet names in file.</returns>
-    /// <param name="filePath">File path.</param>
-    private List<string> GetSheetNamesInFile(string filePath)
+     private List<string> GetSheetNamesInFile(string filePath)
     {
         List<string> sheetNames = new List<string>();
 
