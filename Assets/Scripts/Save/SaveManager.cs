@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
 
 public enum PickType
 {
@@ -25,6 +26,37 @@ public enum StateType
     Gacha       = 4,
 }
 
+
+[Serializable]
+public class SaveData
+{
+    public string dataName;
+
+    //PlayerStatus
+
+    //InGame
+
+    //Map
+    int currentMap;
+    string mapSeed;
+    public List<int> passedRoute;
+
+    //
+    public int battleId;
+
+    public List<int> earnedItems;
+    public List<HeroData> heroDatas; 
+
+}
+
+[Serializable]
+public class HeroData
+{
+    public int heroId;
+    public int slotNum;
+    public List<int> sideIds;
+}
+
 public class SaveManager : Singleton
 {
     public List<Sprite> sprites;
@@ -42,13 +74,12 @@ public class SaveManager : Singleton
 
     private void Start()
     {
-        LoadImage();
         LoadData();
     }
 
     void LoadData()
     {
-        data = SaveDataScript.LoadFromJson();
+        data = LoadFromJson();
         if(data == null)
         {
             Debug.Log("No Data");
@@ -63,102 +94,60 @@ public class SaveManager : Singleton
 
     public void SaveData()
     {
-        SaveDataScript.SaveIntoJson(data);
+        SaveIntoJson(data);
     }
 
-    public void AddPlayer(string name, int value)
-    {
-        //이미 있는 유저인가
-        int existPlayerPos = data.playerNameList.IndexOf(name);
+    const string path = "./Assets/Save/SaveData.json";
 
-        if (existPlayerPos != -1)
-        {
-            data.playerTicketCountList[existPlayerPos] += value;
-        }
-        else
-        {
-            data.playerNameList.Add(name);
-            data.playerTicketCountList.Add(value);
-        }
+    static public void SaveIntoJson(SaveData data)
+    {
+        data.dataName = $"Save_{DateTime.Now}";
+
+        string save = JsonUtility.ToJson(data);
+        //Debug.Log(save);
+        File.WriteAllText(path, save);
+        RefreshEditor();
     }
 
-    public void AddGift(string name, int grade, int value)
+    static public SaveData LoadFromJson()
     {
-        //이미 있는 선물인가
-        int existItemPos = data.giftNameList.IndexOf(name);
-
-        if(existItemPos != -1)
-        {
-            data.giftTicketCountList[existItemPos] += value; 
-        }
-        else
-        {
-            data.giftNameList.Add(name);
-            data.giftGradeList.Add(grade);
-            data.giftPickedList.Add((int)PickType.NotPicked);
-            data.giftTicketCountList.Add(value);
-        }
-    }
-
-    public void DeleteGift(int num)
-    {
-        data.giftNameList.RemoveAt(num);
-        data.giftPickedList.RemoveAt(num);
-        data.giftTicketCountList.RemoveAt(num);
-        SaveData();
-    }
-
-    public void Picked(int giftNum, int playerNum)
-    {
-        data.giftPickedList[giftNum] = playerNum;
-        SaveData();
-    }
-
-    public bool IsPicked()
-    {
-        bool picked = Random.Range(0, data.giftTicketCountList[data.currentGift] + 1) == 0;
-        if (picked)
-            Picked(data.currentGift, data.currentGachaOrder);
-        return picked;
-    }
-
-    public void ChangeTicket(int playerNum, int num)
-    {
-        data.playerTicketCountList[playerNum] += num;
-        SaveData();
-    }
-
-    public void ChangeGiftTicket(int giftNum, int num)
-    {
-        data.giftTicketCountList[giftNum] += num;
-        SaveData();
-    }
-
-    public void LoadImage()
-    {
-        sprites = new List<Sprite>();
-        int count = 0;
         try
         {
-            while (count < 100)
+            //Debug.Log(path);
+            if (File.Exists(path))
             {
-                string path = "./Assets/GiftInfo/" + count + ".png";
-                //Debug.Log(path);
-                if (File.Exists(path))
-                {
-                    byte[] data = File.ReadAllBytes(path);
-                    Texture2D texture = new Texture2D(64, 64);
-                    texture.LoadImage(data);
-                    texture.name = count.ToString();
-                    Sprite sprite = Sprite.Create(texture, 
-                        new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                    sprites.Add(sprite);
-                }
-                else
-                {
-                    break;
-                }
-                count++;
+                string json = File.ReadAllText(path);
+                //Debug.Log(json);
+                SaveData gl = JsonUtility.FromJson<SaveData>(json);
+                return gl;
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            Debug.Log("The file was not found:" + e.Message);
+            return default;
+        }
+        catch (DirectoryNotFoundException e)
+        {
+            Debug.Log("The directory was not found: " + e.Message);
+            return default;
+        }
+        catch (IOException e)
+        {
+            Debug.Log("The file could not be opened:" + e.Message);
+            return default;
+        }
+        return default;
+    }
+
+    static public void DeleteSave()
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+                RefreshEditor();
             }
         }
         catch (FileNotFoundException e)
@@ -174,4 +163,12 @@ public class SaveManager : Singleton
             Debug.Log("The file could not be opened:" + e.Message);
         }
     }
+
+    static public void RefreshEditor()
+    {
+#if UNITY_EDITOR
+        UnityEditor.AssetDatabase.Refresh();
+#endif
+    }
 }
+
