@@ -11,7 +11,7 @@ public class DiceInBattle : MonoBehaviour
 
     int diceId;
     int idx;
-    int currentSide;
+    int sideNum;
     List<int> sideIds = new List<int>();
     List<Sprite> sideSprites = new List<Sprite>();
 
@@ -37,13 +37,13 @@ public class DiceInBattle : MonoBehaviour
 
     public void SetSide(int num)
     {
-        currentSide = num;
+        sideNum = num;
         imgSide.sprite = sideSprites[num];
     }
 
-    public int GetSide()
+    public (int, int) GetDiceInfo()
     {
-        return currentSide;
+        return (diceId, sideNum);
     }
 
     public void OnClickDice()

@@ -7,6 +7,8 @@ using System;
 
 public class UnitInBattle : MonoBehaviour
 {
+    [NonSerialized] public int unitOrder;
+
     public Image imgPortrait;
     public Text textName;
     public Text textAtk;
@@ -20,7 +22,8 @@ public class UnitInBattle : MonoBehaviour
 
     int maxHealth;
     int health;
-    [NonSerialized]public int unitOrder;
+    int maxSlot = 2;
+    int currentSlot = 0;
 
     public void Set(int unitId, int order)
     {
@@ -28,4 +31,14 @@ public class UnitInBattle : MonoBehaviour
         unitOrder = order;
     }
 
+    public void SetDice(int diceId, int sideNum)
+    {
+        if (currentSlot >= maxSlot)
+            return;
+
+        diceSlots[currentSlot].Set(diceId, currentSlot);
+        diceSlots[currentSlot].SetSide(sideNum);
+        diceSlots[currentSlot].gameObject.SetActive(true);
+        currentSlot++;
+    }
 }
