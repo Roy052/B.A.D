@@ -22,7 +22,6 @@ public class BattleSM : Singleton
     public Button btnRollDice;
     public Button btnEndRollDice;
 
-    public DiceManager diceMgr;
     public HeroManager heroMgr;
     public EnemyManager enemyMgr;
 
@@ -45,14 +44,13 @@ public class BattleSM : Singleton
     private void Update()
     {
         if (currentStatusActivated) return;
-        currentStatus++;
         currentStatusActivated = true;
         Invoke($"Set{currentStatus}", 0);
+        currentStatus++;
     }
 
     public void SetBattleStart()
     {
-        diceMgr.Set();
         heroMgr.Set();
         enemyMgr.Set();
         currentStatusActivated = false;
@@ -65,13 +63,13 @@ public class BattleSM : Singleton
 
     public void SetPickDice()
     {
-        diceMgr.PickDice();
+        heroMgr.diceMgr.PickDice();
         currentStatusActivated = false;
     }
 
     public void SetRollSelectDice()
     {
-        diceMgr.RollDice();
+        heroMgr.diceMgr.RollDice();
     }
 
     public void SetPlayDice()

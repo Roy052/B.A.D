@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class DiceManager : Singleton
 {
@@ -12,14 +13,12 @@ public class DiceManager : Singleton
 
     public GameObject dicePrefab;
 
-    public GridLayoutGroup diceGrid;
+    public GridLayoutGroup diceLayout;
 
     List<DiceInBattle> diceList = new List<DiceInBattle>();
     List<int> unUsedDiceList = new List<int>();
     List<int> usedDiceList = new List<int>();
     List<int> currentDiceList = new List<int>();
-
-    int pickedDice = -1;
 
     System.Random random = new System.Random();
 
@@ -78,6 +77,7 @@ public class DiceManager : Singleton
     IEnumerator _RollDice()
     {
         yield return null;
+        diceLayout.gameObject.SetActive(true);
         List<Vector2> randomPoints = new List<Vector2>();
         for (int i = 0; i < 5; i++)
         {
@@ -102,7 +102,7 @@ public class DiceManager : Singleton
         }
         float currentTime = 0;
 
-        diceGrid.enabled = false;
+        diceLayout.enabled = false;
         while (currentTime < 1)
         {
             for (int i = 0; i < 5; i++)
@@ -114,24 +114,34 @@ public class DiceManager : Singleton
             yield return null;
         }
 
-        diceGrid.enabled = true;
+        diceLayout.enabled = true;
 
         battleSM.currentStatusActivated = false;
     }
 
     public void PickDice(int idx)
     {
-        pickedDice = idx;
+        Report.PickDiceInRollSelectDice?.Invoke(idx);
     }
 
     public void ReleaseDice()
     {
-        pickedDice = -1;
+        Report.ReleaseDiceInRollSelectDice?.Invoke();
     }
 
-    public void SetDice(int heroIdx)
+    public (int, int) GetDice(int idx)
     {
-        currentDiceList.Remove(pickedDice);
+        return diceList[idx].GetDiceInfo();
+    }
+
+    public void SetDiceActive(int idx, bool isActive)
+    {
+        diceList[idx].gameObject.SetActive(isActive);
+    }
+
+    public void PlayDice()
+    {
+        diceLayout.gameObject.SetActive(false);
     }
 
     public void RefreshDice()
@@ -141,11 +151,5 @@ public class DiceManager : Singleton
             usedDiceList.Add(currentDiceList[0]);
             currentDiceList.RemoveAt(0);
         }
-    }
-
-    public (int,int) GetPickedDice()
-    {
-        if (pickedDice == -1) return (-1, -1);
-        return diceList[pickedDice].GetDiceInfo();
     }
 }

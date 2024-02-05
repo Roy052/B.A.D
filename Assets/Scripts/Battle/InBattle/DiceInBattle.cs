@@ -9,14 +9,16 @@ public class DiceInBattle : MonoBehaviour
     public Image imgSide;
     public Image imgPicked;
 
-    int diceId;
-    int idx;
-    int sideNum;
-    List<int> sideIds = new List<int>();
-    List<Sprite> sideSprites = new List<Sprite>();
-
     public UnityAction<int> pickDice;
     public UnityAction releaseDice;
+
+    public bool onlyPick = false;
+
+    int diceId;
+    int sideNum;
+    int idx;
+    List<int> sideIds = new List<int>();
+    List<Sprite> sideSprites = new List<Sprite>();
 
     bool isPicked = false;
 
@@ -48,12 +50,21 @@ public class DiceInBattle : MonoBehaviour
 
     public void OnClickDice()
     {
-        if (isPicked == false)
+        if (isPicked == false || onlyPick)
             pickDice?.Invoke(idx);
         else
             releaseDice?.Invoke();
 
         isPicked = !isPicked;
         imgPicked.gameObject.SetActive(isPicked);
+    }
+
+    public void ResetDice()
+    {
+        onlyPick = false;
+        diceId = -1;
+        idx = -1;
+        sideNum = -1;
+        isPicked = false;
     }
 }

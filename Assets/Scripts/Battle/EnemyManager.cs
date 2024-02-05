@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyManager : Singleton
 {
@@ -9,9 +10,9 @@ public class EnemyManager : Singleton
     const int MaxX = 260;
     const int MaxY = 220;
 
-    public GridLayout enemyDiceLayout;
+    public GridLayoutGroup enemyDiceLayout;
 
-    public GameObject enemyPrefab;
+    public GameObject enemyHeroPrefab;
     public GameObject enemyDicePrefab;
 
     List<HeroInBattle> enemyHeroList = new List<HeroInBattle>();
@@ -21,7 +22,7 @@ public class EnemyManager : Singleton
     {
         for (int i = 0; i < 2; i++)
         {
-            GameObject temp = Instantiate(enemyPrefab, enemyPrefab.transform.parent);
+            GameObject temp = Instantiate(enemyHeroPrefab, enemyHeroPrefab.transform.parent);
             HeroInBattle tempHero = temp.GetComponent<HeroInBattle>();
             tempHero.Set(0, i);
             enemyHeroList.Add(tempHero);
@@ -33,6 +34,7 @@ public class EnemyManager : Singleton
             GameObject temp = Instantiate(enemyDicePrefab, enemyDicePrefab.transform.parent);
             DiceInBattle tempDice = temp.GetComponent<DiceInBattle>();
             tempDice.Set(0, i);
+            enemyDiceList.Add(tempDice);
         }
     }
 
@@ -46,12 +48,14 @@ public class EnemyManager : Singleton
             dice.SetSide(Random.Range(0, 6));
         }
 
-        StartCoroutine(_RollDice());
+        StartCoroutine(_RollDiceAndSelectDice());
     }
 
-    IEnumerator _RollDice()
+    IEnumerator _RollDiceAndSelectDice()
     {
         yield return null;
+
+        enemyDiceLayout.gameObject.SetActive(true);
         List<Vector2> randomPoints = new List<Vector2>();
         for (int i = 0; i < 2; i++)
         {
@@ -88,8 +92,25 @@ public class EnemyManager : Singleton
             yield return null;
         }
 
+        yield return new WaitForSeconds(0.2f);
         enemyDiceLayout.enabled = true;
+        yield return new WaitForSeconds(1);
+        enemyDiceLayout.enabled = false;
 
+        for(int i = 0; i < 2; i++)
+        {
+            var temp = enemyDiceList[i].GetDiceInfo();
+            enemyHeroList[i].SetDice(temp.Item1, temp.Item2);
+            enemyDiceList[i].gameObject.SetActive(false);
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        for(int i = 0; i < 2; i++)
+        {
+            enemyDiceList[i].gameObject.SetActive(false);
+        }
+
+        enemyDiceLayout.gameObject.SetActive(false);
         battleSM.currentStatusActivated = false;
     }
 }
