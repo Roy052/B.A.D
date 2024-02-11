@@ -20,6 +20,6 @@ public class HeroInBattle : UnitInBattle
             return;
         }
 
-        pickUnit?.Invoke(unitOrder);
+        pickUnit?.Invoke(unitIdx);
     }
 }

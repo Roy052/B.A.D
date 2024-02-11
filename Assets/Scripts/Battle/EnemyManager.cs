@@ -44,7 +44,6 @@ public class EnemyManager : Singleton
         {
             DiceInBattle dice = enemyDiceList[i];
             dice.gameObject.SetActive(true);
-            dice.Set(0, i);
             dice.SetSide(Random.Range(0, 6));
         }
 
@@ -99,8 +98,8 @@ public class EnemyManager : Singleton
 
         for(int i = 0; i < 2; i++)
         {
-            var temp = enemyDiceList[i].GetDiceInfo();
-            enemyHeroList[i].SetDice(temp.Item1, temp.Item2);
+            var diceInfo = enemyDiceList[i].GetDiceInfo();
+            enemyHeroList[i].SetDice(diceInfo);
             enemyDiceList[i].gameObject.SetActive(false);
             yield return new WaitForSeconds(0.5f);
         }

@@ -7,7 +7,7 @@ using System;
 
 public class UnitInBattle : MonoBehaviour
 {
-    [NonSerialized] public int unitOrder;
+    [NonSerialized] public int unitIdx;
 
     public Image imgPortrait;
     public Text textName;
@@ -20,25 +20,49 @@ public class UnitInBattle : MonoBehaviour
 
     public List<DiceInBattle> diceSlots;
 
+    public UnityAction<int, int> releaseDice;
+
     int maxHealth;
     int health;
     int maxSlot = 2;
     int currentSlot = 0;
 
-    public void Set(int unitId, int order)
+    public virtual void Set(int unitId, int idx)
     {
         textName.text = "Hakos Baelz";
-        unitOrder = order;
+        unitIdx = idx;
     }
 
-    public void SetDice(int diceId, int sideNum)
+    public void SetDice(DiceInBattleInfo info)
     {
         if (currentSlot >= maxSlot)
             return;
 
-        diceSlots[currentSlot].Set(diceId, currentSlot);
-        diceSlots[currentSlot].SetSide(sideNum);
+        diceSlots[currentSlot].Set(info.diceId, info.idx);
+        diceSlots[currentSlot].SetSide(info.sideNum);
         diceSlots[currentSlot].gameObject.SetActive(true);
+        diceSlots[currentSlot].pickDice = ReleaseDice;
         currentSlot++;
+    }
+
+    public void ReleaseDice(int idx)
+    {
+        if (idx == -1 || (diceSlots[0].GetDiceInfo().idx != idx && diceSlots[1].GetDiceInfo().idx != idx))
+        {
+            Debug.Log("Not Exist Dice");
+            return;
+        }
+
+        int diceOrder = diceSlots[0].GetDiceInfo().idx == idx ? 0 : 1;
+        diceSlots[diceOrder].ResetDice();
+        if (diceOrder == 1)
+        {
+            diceSlots[0].SetDiceInfo(diceSlots[1].GetDiceInfo());
+            diceSlots[1].ResetDice();
+        }
+        currentSlot--;
+
+
+        releaseDice?.Invoke(unitIdx, idx);
     }
 }

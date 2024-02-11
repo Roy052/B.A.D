@@ -4,6 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
+public class DiceInBattleInfo
+{
+    public int diceId;
+    public int sideNum;
+    public int idx;
+}
+
 public class DiceInBattle : MonoBehaviour
 {
     public Image imgSide;
@@ -14,9 +21,7 @@ public class DiceInBattle : MonoBehaviour
 
     public bool onlyPick = false;
 
-    int diceId;
-    int sideNum;
-    int idx;
+    DiceInBattleInfo info = new DiceInBattleInfo();
     List<int> sideIds = new List<int>();
     List<Sprite> sideSprites = new List<Sprite>();
 
@@ -24,8 +29,8 @@ public class DiceInBattle : MonoBehaviour
 
     public void Set(int diceId, int idx)
     {
-        this.diceId = diceId;
-        this.idx = idx;
+        info.diceId = diceId;
+        info.idx = idx;
 
         sideIds.Clear();
         for (int i = 0; i < 6; i++)
@@ -39,19 +44,25 @@ public class DiceInBattle : MonoBehaviour
 
     public void SetSide(int num)
     {
-        sideNum = num;
+        info.sideNum = num;
         imgSide.sprite = sideSprites[num];
     }
 
-    public (int, int) GetDiceInfo()
+    public void SetDiceInfo(DiceInBattleInfo otherInfo)
     {
-        return (diceId, sideNum);
+        Set(otherInfo.diceId, otherInfo.idx);
+        SetSide(otherInfo.sideNum);
+    }
+
+    public DiceInBattleInfo GetDiceInfo()
+    {
+        return info;
     }
 
     public void OnClickDice()
     {
         if (isPicked == false || onlyPick)
-            pickDice?.Invoke(idx);
+            pickDice?.Invoke(info.idx);
         else
             releaseDice?.Invoke();
 
@@ -62,9 +73,10 @@ public class DiceInBattle : MonoBehaviour
     public void ResetDice()
     {
         onlyPick = false;
-        diceId = -1;
-        idx = -1;
-        sideNum = -1;
+        info.diceId = -1;
+        info.idx = -1;
+        info.sideNum = -1;
         isPicked = false;
+        imgSide.sprite = null;
     }
 }

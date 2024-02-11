@@ -29,6 +29,7 @@ public class DiceManager : Singleton
             GameObject temp = Instantiate(dicePrefab, dicePrefab.transform.parent);
             DiceInBattle tempDice = temp.GetComponent<DiceInBattle>();
             diceList.Add(tempDice);
+            tempDice.Set(0, i);
             tempDice.pickDice = PickDice;
             tempDice.releaseDice = ReleaseDice;
         }
@@ -59,6 +60,8 @@ public class DiceManager : Singleton
             currentDiceList.Add(unUsedDiceList[randomIdx]);
             unUsedDiceList.RemoveAt(randomIdx);
         }
+
+        currentDiceList.Sort();
     }
 
     public void RollDice()
@@ -67,7 +70,6 @@ public class DiceManager : Singleton
         {
             DiceInBattle dice = diceList[currentDiceList[i]];
             dice.gameObject.SetActive(true);
-            dice.Set(0, i);
             dice.SetSide(Random.Range(0, 6));
         }
 
@@ -129,7 +131,7 @@ public class DiceManager : Singleton
         Report.ReleaseDiceInRollSelectDice?.Invoke();
     }
 
-    public (int, int) GetDice(int idx)
+    public DiceInBattleInfo GetDice(int idx)
     {
         return diceList[idx].GetDiceInfo();
     }
@@ -144,7 +146,7 @@ public class DiceManager : Singleton
         diceLayout.gameObject.SetActive(false);
     }
 
-    public void RefreshDice()
+    public void CleanUp()
     {
         while(currentDiceList.Count > 0)
         {

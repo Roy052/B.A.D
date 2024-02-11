@@ -13,8 +13,8 @@ public class HeroManager : Singleton
 
     List<HeroInBattle> heroList = new List<HeroInBattle>();
 
-    int currentHeroOrder;
-    int currentDiceOrder;
+    int currentHeroIdx = -1;
+    int currentDiceIdx = -1;
     public void Set()
     {
         for (int i = 0; i < 5; i++)
@@ -23,6 +23,7 @@ public class HeroManager : Singleton
             HeroInBattle tempHero = temp.GetComponent<HeroInBattle>();
             heroList.Add(tempHero);
             temp.SetActive(true);
+            tempHero.Set(0, i);
             tempHero.pickUnit = PickUnit;
         }
 
@@ -35,28 +36,40 @@ public class HeroManager : Singleton
 
     }
 
-    void PickDice(int diceOrder) 
+    void PickDice(int idx) 
     {
-        currentDiceOrder = diceOrder;
-        if(currentHeroOrder != -1 && currentHeroOrder != -1)
-        {
-            var diceInfo = diceMgr.GetDice(currentDiceOrder);
-            heroList[currentHeroOrder].SetDice(diceInfo.Item1, diceInfo.Item2);
-        }
+        currentDiceIdx = idx;
+        if (currentHeroIdx != -1 && currentHeroIdx != -1)
+            SetDiceToUnit();
     }
 
     void PickUnit(int heroOrder)
     {
-        currentHeroOrder = heroOrder;
-        if(currentHeroOrder != -1 && currentDiceOrder != -1)
-        {
-            var diceInfo = diceMgr.GetDice(currentDiceOrder);
-            heroList[currentHeroOrder].SetDice(diceInfo.Item1, diceInfo.Item2);
-        }
+        currentHeroIdx = heroOrder;
+        if (currentHeroIdx != -1 && currentDiceIdx != -1)
+            SetDiceToUnit();
     }
 
-    void ReleaseDice()
+    void SetDiceToUnit()
     {
+        var diceInfo = diceMgr.GetDice(currentDiceIdx);
+        heroList[currentHeroIdx].SetDice(diceInfo);
+        heroList[currentHeroIdx].releaseDice = ReleaseDice;
+        currentHeroIdx = -1;
+        currentDiceIdx = -1;
+        diceMgr.SetDiceActive(diceInfo.idx, false);
+    }
 
+    void ReleaseDice(int unitIdx,int diceIdx)
+    {
+        var diceInfo = diceMgr.GetDice(diceIdx);
+        diceMgr.SetDiceActive(diceInfo.idx, true);
+    }
+
+    void CleanUp()
+    {
+        currentHeroIdx = -1;
+        currentDiceIdx = -1;
+        diceMgr.CleanUp();
     }
 }
