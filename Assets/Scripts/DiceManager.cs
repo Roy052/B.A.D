@@ -139,6 +139,8 @@ public class DiceManager : Singleton
     public void SetDiceActive(int idx, bool isActive)
     {
         diceList[idx].gameObject.SetActive(isActive);
+        diceList[idx].imgPicked.gameObject.SetActive(false);
+        diceList[idx].isPicked = false;
     }
 
     public void PlayDice()

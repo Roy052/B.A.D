@@ -42,6 +42,7 @@ public class UnitInBattle : MonoBehaviour
         diceSlots[currentSlot].SetSide(info.sideNum);
         diceSlots[currentSlot].gameObject.SetActive(true);
         diceSlots[currentSlot].pickDice = ReleaseDice;
+        diceSlots[currentSlot].onlyPick = true;
         currentSlot++;
     }
 
@@ -54,15 +55,18 @@ public class UnitInBattle : MonoBehaviour
         }
 
         int diceOrder = diceSlots[0].GetDiceInfo().idx == idx ? 0 : 1;
-        diceSlots[diceOrder].ResetDice();
-        if (diceOrder == 1)
+        bool isOtherExist = diceSlots[1].GetDiceInfo().idx != -1;
+        if (isOtherExist)
         {
-            diceSlots[0].SetDiceInfo(diceSlots[1].GetDiceInfo());
+            if(diceOrder == 0)
+                diceSlots[0].SetDiceInfo(diceSlots[1].GetDiceInfo());
             diceSlots[1].ResetDice();
         }
+        else
+        {
+            diceSlots[0].ResetDice();
+        }
         currentSlot--;
-
-
         releaseDice?.Invoke(unitIdx, idx);
     }
 }

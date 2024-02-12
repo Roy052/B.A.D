@@ -25,7 +25,7 @@ public class DiceInBattle : MonoBehaviour
     List<int> sideIds = new List<int>();
     List<Sprite> sideSprites = new List<Sprite>();
 
-    bool isPicked = false;
+    public bool isPicked = false;
 
     public void Set(int diceId, int idx)
     {

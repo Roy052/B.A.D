@@ -32,14 +32,14 @@ public class DataManager: Singleton
 
     public void SetDatas()
     {
-        var unitDatas = LoadFromJson();
+        var unitDatas = LoadFromJson_Hero();
         for(int i = 0; i < unitDatas.data.Count; i++)
         {
             //UnitData.unitDatas.Add(i, unitDatas.UnitDatas[i]);
         }
     }
 
-    DataList<UnitData> LoadFromJson()
+    DataList<HeroData> LoadFromJson_Hero()
     {
         try
         {
@@ -48,7 +48,7 @@ public class DataManager: Singleton
             {
                 string jsonText = File.ReadAllText(pathHead + sheets[0] + pathTail);
                 //Debug.Log(json);
-                DataList<UnitData> dataList = JsonUtility.FromJson<DataList<UnitData>> ("{\"data\":" + jsonText + "}");
+                DataList<HeroData> dataList = JsonUtility.FromJson<DataList<HeroData>> ("{\"data\":" + jsonText + "}");
                 return dataList;
             }
         }

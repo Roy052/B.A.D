@@ -45,12 +45,12 @@ public class SaveData
     public int battleId;
 
     public List<int> earnedItems;
-    public List<HeroData> heroDatas; 
+    public List<HeroInBattleData> heroDatas; 
 
 }
 
 [Serializable]
-public class HeroData
+public class HeroInBattleData
 {
     public int heroId;
     public int slotNum;
